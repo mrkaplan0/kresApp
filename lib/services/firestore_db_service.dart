@@ -3,7 +3,8 @@ import 'package:krestakipapp/models/photo.dart';
 import 'package:krestakipapp/models/student.dart';
 import 'package:krestakipapp/models/teacher.dart';
 import 'package:krestakipapp/models/user.dart';
-import 'base/database_base.dart';
+import 'package:krestakipapp/services/base/database_base.dart';
+import 'package:flutter/material.dart';
 
 class FirestoreDBService implements DBBase {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -39,45 +40,21 @@ class FirestoreDBService implements DBBase {
     return _okunanUserNesnesi;
   }
 
-  checkOgrIDisUseable(Student student) async {
-    QuerySnapshot stuIsSaved = await _firestore
-        .collection("Student")
-        .where('ogrID', isEqualTo: student.ogrID)
+  @override
+  Future<String> queryKresList(String kresCode) async {
+    QuerySnapshot checkKresCode = await _firestore
+        .collection("Kresler")
+        .where('kresCode', isEqualTo: kresCode)
         .get();
 
-    if (stuIsSaved.docs.length > 0)
-      return true;
-    else
-      return false;
-  }
-
-  @override
-  Future<bool> saveStudent(Student student) async {
-    await _firestore
-        .collection("Student")
-        .doc(student.ogrID)
-        .set(student.toMap(), SetOptions(merge: true))
-        .then((value) => print("Öğrenci Kaydedildi."))
-        .catchError((error) => print("Öğrenci kayıt hatası: $error"));
-    return true;
-  }
-
-  @override
-  Future<bool> deleteStudent(Student student) async {
-    await _firestore
-        .collection("Student")
-        .doc(student.ogrID)
-        .delete()
-        .then((value) => print("Öğrenci silindi."))
-        .catchError((error) => print("Öğrenci silme hatası: $error"));
-    await _firestore
-        .collection("Veli")
-        .doc(student.ogrID)
-        .delete()
-        .then((value) => print("veli silindi."))
-        .catchError((error) => print("Öğrenci silme hatası: $error"));
-
-    return true;
+    if (checkKresCode.docs.isNotEmpty) {
+      debugPrint(checkKresCode.docs.first.data().toString());
+      Map<String, dynamic> map =
+          checkKresCode.docs.first.data() as Map<String, dynamic>;
+      return map['kresAdi'].toString();
+    } else {
+      return '';
+    }
   }
 
   @override
@@ -94,61 +71,6 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Stream<List<Student>> getStudents() {
-    var snapShot = _firestore.collection('Student').snapshots();
-    Stream<List<Student>> stuList = snapShot.map((ogrList) => ogrList.docs
-        .map((student) => Student.fromMap(student.data()))
-        .toList());
-    return stuList;
-  }
-
-  @override
-  Future<List<Student>> getStudentsFuture() async {
-    QuerySnapshot querySnapshot = await _firestore.collection('Student').get();
-    List<Student> list = [];
-
-    for (DocumentSnapshot tekOgr in querySnapshot.docs) {
-      print(tekOgr.data()! as Map<String, dynamic>);
-      Student eklenecekStu =
-          Student.fromMap(tekOgr.data()! as Map<String, dynamic>);
-      list.add(eklenecekStu);
-    }
-
-    return list;
-  }
-
-  updateOgrProfilePhoto(String ogrID, String url) async {
-    if (ogrID.length < 7)
-      await _firestore
-          .collection("Student")
-          .doc(ogrID)
-          .update({'fotoUrl': url});
-    else
-      //teacher ID, min 5 haneli olacak şekilde planladım.
-      await _firestore
-          .collection("Teacher")
-          .doc(ogrID)
-          .update({'fotoUrl': url});
-  }
-
-  @override
-  Future<bool> saveTeacher(Teacher teacher) async {
-    await _firestore
-        .collection("Teacher")
-        .doc(teacher.teacherID)
-        .set(teacher.toMap(), SetOptions(merge: true))
-        .then((value) => print("örtmen Kaydedildi."))
-        .catchError((error) => print("örtmen kayıt hatası: $error"));
-    return true;
-  }
-
-  @override
-  Future<bool> deleteTeacher(Teacher teacher) async {
-    await _firestore.collection("Teacher").doc(teacher.teacherID).delete();
-    return true;
-  }
-
-  @override
   Stream<List<Teacher>> getTeachers() {
     var snapShot = _firestore.collection('Teacher').snapshots();
 
@@ -158,50 +80,19 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Future<bool> ogrNoControl(String ogrNo) async {
-    if (ogrNo.length < 8) {
-      QuerySnapshot stuIsSaved = await _firestore
-          .collection("Student")
-          .where('ogrID', isEqualTo: ogrNo)
-          .get();
+  Future<bool> ogrNoControl(
+      String kresCode, String kresAdi, String ogrNo) async {
+    QuerySnapshot stuIsSaved = await _firestore
+        .collection("Kresler")
+        .doc(kresCode + '_' + kresAdi)
+        .collection("Students")
+        .where('ogrID', isEqualTo: ogrNo)
+        .get();
 
-      if (stuIsSaved.docs.length > 0)
-        return true;
-      else
-        return false;
-    } else {
-      QuerySnapshot stuIsSaved = await _firestore
-          .collection("Teacher")
-          .where('teacherID', isEqualTo: ogrNo)
-          .get();
-      print('teacher kontrol');
-      if (stuIsSaved.docs.length > 0)
-        return true;
-      else
-        return false;
-    }
-  }
-
-  @override
-  Future<bool> addCriteria(String criteria) async {
-    await _firestore
-        .collection("Criteria")
-        .doc("Criteria")
-        .set({criteria: criteria}, SetOptions(merge: true))
-        .then((value) => print("kriter Kaydedildi."))
-        .catchError((error) => print("kriter kayıt hatası: $error"));
-    return true;
-  }
-
-  @override
-  Future<bool> deleteCriteria(String criteria) async {
-    await _firestore
-        .collection("Criteria")
-        .doc("Criteria")
-        .set({criteria: FieldValue.delete()}, SetOptions(merge: true))
-        .then((value) => print("kriter silindi."))
-        .catchError((error) => print("kriter silme hatası: $error"));
-    return true;
+    if (stuIsSaved.docs.length > 0)
+      return true;
+    else
+      return false;
   }
 
   @override
@@ -215,49 +106,6 @@ class FirestoreDBService implements DBBase {
       kriterList.add(element.toString());
     });
     return kriterList;
-  }
-
-  @override
-  Future<bool> uploadPhotoToGallery(String ogrID, String fotoUrl) async {
-    await _firestore
-        .collection("Student")
-        .doc(ogrID)
-        .collection("Gallery")
-        .doc(ogrID)
-        .set({fotoUrl.substring(fotoUrl.indexOf('token=')): fotoUrl},
-            SetOptions(merge: true));
-    return true;
-  }
-
-  @override
-  Future<bool> deletePhoto(String ogrID, String fotoUrl) async {
-    await _firestore
-        .collection("Student")
-        .doc(ogrID)
-        .collection("Gallery")
-        .doc(ogrID)
-        .update({
-      fotoUrl.substring(fotoUrl.indexOf('token=')): FieldValue.delete()
-    }).then((value) => print("Silindi."));
-    return true;
-  }
-
-  @override
-  Future<bool> saveRatings(String ogrID, Map<String, dynamic> ratings,
-      bool showPhotoMainPage) async {
-    await _firestore
-        .collection("Student")
-        .doc(ogrID)
-        .collection("Ratings")
-        .doc(ratings['Son Değerlendirme'].toString())
-        .set(ratings, SetOptions(merge: true));
-    if (showPhotoMainPage == true && ratings['Fotoğraflar'] != null) {
-      for (int i = 0; i < ratings['Fotoğraflar'].length; i++)
-        await _firestore.collection('Main').doc('Gallery').set(
-            {Timestamp.now().toString(): ratings['Fotoğraflar'][i]},
-            SetOptions(merge: true));
-    }
-    return true;
   }
 
   @override

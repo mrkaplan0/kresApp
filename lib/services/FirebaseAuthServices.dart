@@ -109,12 +109,6 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<bool> ogrNoControl(String ogrNo) {
-    // TODO: implement ogrNoControl
-    throw UnimplementedError();
-  }
-
-  @override
   Future<List<Student>> getStudentFuture() async {
     // TODO: implement getStudentFuture
     throw UnimplementedError();
@@ -197,6 +191,18 @@ class FirebaseAuthService implements AuthBase {
   @override
   Future<List<Map<String, dynamic>>> getAnnouncements() {
     // TODO: implement getAnnouncements
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> queryKresList(String kresCode) {
+    // TODO: implement queryKresList
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> ogrNoControl(String kresCode, String kresAdi, String ogrNo) {
+    // TODO: implement ogrNoControl
     throw UnimplementedError();
   }
 }

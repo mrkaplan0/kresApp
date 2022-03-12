@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/View_models/user_model.dart';
-import 'package:krestakipapp/homepage-admin/admin_settings.dart';
 import 'package:krestakipapp/homepage-visitor/home_page.dart';
-import 'package:krestakipapp/homepage_teacher/teacher_homepage.dart';
 import 'package:provider/provider.dart';
-
-import 'models/photo.dart';
 import 'signin/login_page.dart';
 
 class LandingPage extends StatelessWidget {
@@ -18,10 +14,6 @@ class LandingPage extends StatelessWidget {
         return LoginPage();
       } else {
         switch (_userModel.users!.position) {
-          case 'Admin':
-            return AdminSettings();
-          case 'Öğretmen':
-            return TeacherHomePage();
           case 'visitor':
             return HomePage();
           default:

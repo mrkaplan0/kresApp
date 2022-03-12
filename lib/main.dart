@@ -1,10 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:krestakipapp/homepage-admin/student_settings/student_list.dart';
-import 'package:krestakipapp/homepage-admin/student_settings/student_management.dart';
+
 import 'package:krestakipapp/landing_page.dart';
-import 'package:krestakipapp/signin/register_page.dart';
+
 import 'package:provider/provider.dart';
 import 'View_models/user_model.dart';
 import 'constants.dart';
@@ -38,8 +37,6 @@ class MyApp extends StatelessWidget {
             child: GetMaterialApp(
               routes: {
                 '/LandingPage': (context) => LandingPage(),
-                '/StudentManagement': (context) => StudentManagement(),
-                '/StudentListPage': (context) => StudentListPage(),
               },
               theme: ThemeData(
                   primarySwatch: primarySwatch,

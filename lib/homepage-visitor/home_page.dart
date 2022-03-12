@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:krestakipapp/View_models/user_model.dart';
 import 'package:krestakipapp/common_widget/show_photo_widget.dart';
 import 'package:krestakipapp/constants.dart';
-import 'package:krestakipapp/homepage-admin/student_settings/student_page_for_visitor.dart';
 import 'package:krestakipapp/homepage-visitor/photo_gallery.dart';
 import 'package:krestakipapp/models/photo.dart';
-import 'package:krestakipapp/models/student.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -94,19 +92,7 @@ class _HomePageState extends State<HomePage> {
                   child: GestureDetector(
                     child: Container(
                         child: Image.asset("assets/images/gallery7.png")),
-                    onTap: () {
-                      final UserModel _userModel =
-                          Provider.of<UserModel>(context, listen: false);
-
-                      if (_userModel.users!.studentMap != null) {
-                        var student =
-                            Student.fromMap(_userModel.users!.studentMap!);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => StudentPage(student)));
-                      }
-                    },
+                    onTap: () {},
                   ),
                 ),
                 SizedBox(

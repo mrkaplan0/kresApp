@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/constants.dart';
 import 'package:krestakipapp/signin/email_login.dart';
@@ -7,13 +7,17 @@ import 'package:krestakipapp/signin/research_student_pre_register.dart';
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+
     return Scaffold(
-      body: Stack(
+        body: Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage('assets/images/splash.png'), fit: BoxFit.fill),
+      ),
+      child: Stack(
         fit: StackFit.expand,
         children: [
-          Image(
-            image: AssetImage('assets/images/splash.png'),
-          ),
           SizedBox(height: 100),
           Image(
             alignment: Alignment.topCenter,
@@ -76,6 +80,6 @@ class LoginPage extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }
