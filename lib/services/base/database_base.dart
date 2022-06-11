@@ -6,8 +6,9 @@ import 'package:krestakipapp/models/user.dart';
 abstract class DBBase {
   Future<bool> saveUser(MyUser users);
   Future<MyUser> readUser(String userId);
+  Future<List<Map<String, dynamic>>> getKresList();
   Future<String> queryKresList(String kresCode);
-  Future<bool> ogrNoControl(String kresCode, String kresAdi, String ogrNo);
+  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID);
 
   Future<Student> getStudent(String ogrNo);
 

@@ -41,9 +41,24 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> getKresList() async {
+    QuerySnapshot kresler =
+        await _firestore.collection("KreslerChecking").get();
+
+    List<Map<String, dynamic>> list = [];
+
+    for (DocumentSnapshot kres in kresler.docs) {
+      Map<String, dynamic> map = kres.data()! as Map<String, dynamic>;
+      list.add(map);
+    }
+    debugPrint(list.toString());
+    return list;
+  }
+
+  @override
   Future<String> queryKresList(String kresCode) async {
     QuerySnapshot checkKresCode = await _firestore
-        .collection("Kresler")
+        .collection("KreslerChecking")
         .where('kresCode', isEqualTo: kresCode)
         .get();
 
@@ -80,19 +95,21 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Future<bool> ogrNoControl(
-      String kresCode, String kresAdi, String ogrNo) async {
-    QuerySnapshot stuIsSaved = await _firestore
-        .collection("Kresler")
+  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID) async {
+    QuerySnapshot querySnapshot = await _firestore
+        .collection("KreslerChecking")
         .doc(kresCode + '_' + kresAdi)
         .collection("Students")
-        .where('ogrID', isEqualTo: ogrNo)
         .get();
 
-    if (stuIsSaved.docs.length > 0)
-      return true;
-    else
-      return false;
+    List<int> list = [];
+
+    for (DocumentSnapshot ogrID in querySnapshot.docs) {
+      Map<String, dynamic> map = ogrID.data()! as Map<String, dynamic>;
+      list.add(int.parse(map['ogrID']));
+    }
+    var r = list.contains(int.parse(ogrID));
+    return r;
   }
 
   @override

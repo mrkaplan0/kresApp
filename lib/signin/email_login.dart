@@ -14,7 +14,7 @@ class EmailLogin extends StatefulWidget {
 }
 
 class _EmailLoginState extends State<EmailLogin> {
-  late String _email, _sifre, firma;
+  late String _email, _sifre;
   String _buttonText = "Giriş";
 
   final _formKey = GlobalKey<FormState>();

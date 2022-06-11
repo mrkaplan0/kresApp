@@ -12,7 +12,7 @@ class MyUser {
   DateTime? createdAt;
   String? token;
   Map<String, dynamic>? studentMap;
-  MyUser({required this.userID, required this.email, this.isAdmin});
+  MyUser({required this.userID, required this.phone, this.isAdmin});
 
   Map<String, dynamic> toMap() {
     return {

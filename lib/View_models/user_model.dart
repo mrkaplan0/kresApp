@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/locator.dart';
 import 'package:krestakipapp/models/photo.dart';
@@ -65,6 +66,18 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
+  Future<MyUser?> signingWithPhone(UserCredential userCredential) async {
+    try {
+      state = ViewState.busy;
+      _users = await _userRepository.signingWithPhone(userCredential);
+
+      return _users;
+    } finally {
+      state = ViewState.idle;
+    }
+  }
+
+  @override
   Future<MyUser?> signingWithEmailAndPassword(
       String email, String sifre) async {
     try {
@@ -108,10 +121,10 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<String> queryKresList(String kresCode) async {
+  Future<String> queryKresList(String kresAdi) async {
     try {
       state = ViewState.busy;
-      var sonuc = await _userRepository.queryKresList(kresCode);
+      var sonuc = await _userRepository.queryKresList(kresAdi);
 
       return sonuc;
     } catch (e) {
@@ -123,11 +136,10 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<bool> ogrNoControl(
-      String kresCode, String kresAdi, String ogrNo) async {
+  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID) async {
     try {
       state = ViewState.busy;
-      bool sonuc = await _userRepository.ogrNoControl(kresCode, kresAdi, ogrNo);
+      bool sonuc = await _userRepository.queryOgrID(kresCode, kresAdi, ogrID);
 
       return sonuc;
     } catch (e) {
@@ -169,7 +181,7 @@ class UserModel with ChangeNotifier implements AuthBase {
 
       return sonuc;
     } catch (e) {
-      debugPrint("User Model savephoto hata :" + e.toString());
+      debugPrint("User Model getphoto hata :" + e.toString());
       return List.empty();
     }
   }
@@ -194,6 +206,20 @@ class UserModel with ChangeNotifier implements AuthBase {
       return sonuc;
     } catch (e) {
       debugPrint("User Model get announcment hata :" + e.toString());
+      return List.empty();
+    } finally {
+      state = ViewState.idle;
+    }
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getKresList() async {
+    try {
+      var sonuc = await _userRepository.getKresList();
+
+      return sonuc;
+    } catch (e) {
+      debugPrint("User Model get kresList hata :" + e.toString());
       return List.empty();
     } finally {
       state = ViewState.idle;

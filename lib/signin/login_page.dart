@@ -7,7 +7,7 @@ import 'package:krestakipapp/signin/research_student_pre_register.dart';
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     return Scaffold(
         body: Container(

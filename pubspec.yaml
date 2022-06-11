@@ -43,6 +43,8 @@ dependencies:
   image: ^3.0.8
   image_editor: ^1.0.1
   flutter_svg: ^1.0.0
+  firebase_phone_auth_handler: ^1.0.1
+  textfield_search: ^0.10.0
 
 
 dev_dependencies:

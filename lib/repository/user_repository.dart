@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:krestakipapp/locator.dart';
 import 'package:krestakipapp/models/photo.dart';
 import 'package:krestakipapp/models/student.dart';
@@ -22,6 +24,20 @@ class UserRepository implements AuthBase {
       return await _firestoreDBService.readUser(_user.userID!);
     else
       return null;
+  }
+
+  @override
+  Future<MyUser?> signingWithPhone(UserCredential userCredential) async {
+    MyUser? _user = await _firebaseAuthService.signingWithPhone(userCredential);
+    _user!.position = 'visitor';
+
+    bool _sonuc = await _firestoreDBService.saveUser(_user);
+    if (_sonuc) {
+      return await _firestoreDBService.readUser(_user.userID!);
+    } else {
+      debugPrint("sıkıntı burada");
+      return null;
+    }
   }
 
   @override
@@ -52,13 +68,13 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<String> queryKresList(String kresCode) async {
-    return await _firestoreDBService.queryKresList(kresCode);
+  Future<String> queryKresList(String kresAdi) async {
+    return await _firestoreDBService.queryKresList(kresAdi);
   }
 
   @override
-  Future<bool> ogrNoControl(String kresCode, String kresAdi,String ogrNo) async {
-    return await _firestoreDBService.ogrNoControl(kresCode,kresAdi,ogrNo);
+  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID) async {
+    return await _firestoreDBService.queryOgrID(kresCode, kresAdi, ogrID);
   }
 
   @override
@@ -84,5 +100,10 @@ class UserRepository implements AuthBase {
   @override
   Future<List<Map<String, dynamic>>> getAnnouncements() async {
     return await _firestoreDBService.getAnnouncements();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getKresList() async {
+    return await _firestoreDBService.getKresList();
   }
 }

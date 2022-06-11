@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/models/photo.dart';
-import 'package:krestakipapp/models/student.dart';
-import 'package:krestakipapp/models/teacher.dart';
 import 'package:krestakipapp/models/user.dart';
 import 'package:krestakipapp/services/base/auth_base.dart';
 
@@ -24,7 +22,7 @@ class FirebaseAuthService implements AuthBase {
   }
 
   MyUser _usersFromFirebase(User user) {
-    return MyUser(userID: user.uid, email: user.email!);
+    return MyUser(userID: user.uid, phone: user.phoneNumber);
   }
 
   @override
@@ -38,14 +36,13 @@ class FirebaseAuthService implements AuthBase {
     }
   }
 
+  MyUser? myUser;
   @override
-  Future<MyUser?> signingWithAnonymously() async {
+  Future<MyUser?> signingWithPhone(UserCredential userCredential) async {
     try {
-      UserCredential sonuc = await _auth.signInAnonymously();
-
-      return _usersFromFirebase(sonuc.user!);
+      return _usersFromFirebase(userCredential.user!);
     } catch (e) {
-      debugPrint("Hata SignAnonymously $e");
+      debugPrint("Hata phone auth $e");
       return null;
     }
   }
@@ -66,75 +63,8 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<String> uploadOgrProfilePhoto(
-      String ogrID, String ogrAdi, String fileType, File yuklenecekDosya) {
-    // TODO: implement uploadOgrProfilePhoto
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> saveStudent(Student student) {
-    // TODO: implement saveStudent
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<List<Student>> getStudents() {
-    // TODO: implement getStudents
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> deleteStudent(Student student) {
-    // TODO: implement deleteStudent
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> deleteTeacher(Teacher teacher) {
-    // TODO: implement deleteTeacher
-    throw UnimplementedError();
-  }
-
-  @override
-  Stream<List<Teacher>> getTeachers() {
-    // TODO: implement getTeachers
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> saveTeacher(Teacher teacher) {
-    // TODO: implement saveTeacher
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<Student>> getStudentFuture() async {
-    // TODO: implement getStudentFuture
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> addCriteria(String criteria) {
-    // TODO: implement addCriteria
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> deleteCriteria(String criteria) {
-    // TODO: implement deleteCriteria
-    throw UnimplementedError();
-  }
-
-  @override
   Future<List<String>> getCriteria() {
     // TODO: implement getCriteria
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> deletePhoto(String ogrID, String fotoUrl) {
-    // TODO: implement deletePhoto
     throw UnimplementedError();
   }
 
@@ -145,28 +75,8 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<bool> saveRatings(
-      String ogrID, Map<String, dynamic> ratings, bool showPhotoMainPage) {
-    // TODO: implement saveRatings
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<String> uploadPhotoToGallery(
-      String ogrID, String ogrAdi, String fileType, File yuklenecekDosya) {
-    // TODO: implement uploadPhotoToGallery
-    throw UnimplementedError();
-  }
-
-  @override
   Future<List<Photo>> getPhotoToMainGallery() {
     // TODO: implement getPhotoToMainGallery
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> savePhotoToMainGallery(Photo myPhoto) {
-    // TODO: implement savePhotoToMainGallery
     throw UnimplementedError();
   }
 
@@ -177,17 +87,6 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<bool> savePhotoToSpecialGallery(Photo myPhoto) {
-    // TODO: implement savePhotoToSpecialGallery
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<bool> addAnnouncement(Map<String, dynamic> map) {
-    // TODO: implement addAnnouncement
-    throw UnimplementedError();
-  }
-
   @override
   Future<List<Map<String, dynamic>>> getAnnouncements() {
     // TODO: implement getAnnouncements
@@ -201,8 +100,14 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<bool> ogrNoControl(String kresCode, String kresAdi, String ogrNo) {
+  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID) {
     // TODO: implement ogrNoControl
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getKresList() {
+    // TODO: implement getKresList
     throw UnimplementedError();
   }
 }
