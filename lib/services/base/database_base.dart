@@ -6,9 +6,12 @@ import 'package:krestakipapp/models/user.dart';
 abstract class DBBase {
   Future<bool> saveUser(MyUser users);
   Future<MyUser> readUser(String userId);
+  Future<bool> deleteUser(String userID);
+
   Future<List<Map<String, dynamic>>> getKresList();
   Future<String> queryKresList(String kresCode);
-  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID);
+  Future<Student?> queryOgrID(
+      String kresCode, String kresAdi, String ogrID, String phone);
 
   Future<Student> getStudent(String ogrNo);
 
@@ -18,8 +21,10 @@ abstract class DBBase {
 
   Future<List<Map<String, dynamic>>> getRatings(String ogrID);
 
-  Future<List<Photo>> getPhotoToMainGallery();
-  Future<List<Photo>> getPhotoToSpecialGallery(String ogrID);
+  Future<List<Photo>> getPhotoToMainGallery(String kresCode, String kresAdi);
+  Future<List<Photo>> getPhotoToSpecialGallery(
+      String kresCode, String kresAdi, String ogrID);
 
-  Future<List<Map<String, dynamic>>> getAnnouncements();
+  Future<List<Map<String, dynamic>>> getAnnouncements(
+      String kresCode, String kresAdi);
 }

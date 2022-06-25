@@ -27,15 +27,17 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<MyUser?> signingWithPhone(UserCredential userCredential) async {
-    MyUser? _user = await _firebaseAuthService.signingWithPhone(userCredential);
+  Future<MyUser?> signingWithPhone(UserCredential userCredential,
+      String kresCode, String kresAdi, String ogrID, String phone) async {
+    MyUser? _user = await _firebaseAuthService.signingWithPhone(
+        userCredential, kresAdi, kresAdi, ogrID, phone);
+
     _user!.position = 'visitor';
 
     bool _sonuc = await _firestoreDBService.saveUser(_user);
     if (_sonuc) {
       return await _firestoreDBService.readUser(_user.userID!);
     } else {
-      debugPrint("sıkıntı burada");
       return null;
     }
   }
@@ -46,25 +48,10 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<MyUser> signingWithEmailAndPassword(String email, String sifre) async {
-    MyUser _user =
-        await _firebaseAuthService.signingWithEmailAndPassword(email, sifre);
-    return await _firestoreDBService.readUser(_user.userID!);
-  }
-
-  @override
-  Future<MyUser?> createUserEmailAndPassword(String email, String sifre) async {
-    MyUser _user =
-        await _firebaseAuthService.createUserEmailAndPassword(email, sifre);
-
-    //TODO: buraya şifreye göre position güncellemesi eklenecek gerçi telefon girişine
-    Student stu = await _firestoreDBService.getStudent(sifre);
-    _user.studentMap = stu.toMap();
-    bool _sonuc = await _firestoreDBService.saveUser(_user);
-    if (_sonuc) {
-      return await _firestoreDBService.readUser(_user.userID!);
-    } else
-      return null;
+  Future<bool> deleteUser() async {
+    var _user = await _firebaseAuthService.currentUser();
+    await _firestoreDBService.deleteUser(_user!.userID!);
+    return await _firebaseAuthService.deleteUser();
   }
 
   @override
@@ -73,8 +60,25 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID) async {
-    return await _firestoreDBService.queryOgrID(kresCode, kresAdi, ogrID);
+  Future<Student?> queryOgrID(
+      String kresCode, String kresAdi, String ogrID, String phoneNumber) async {
+    Student? student = await _firestoreDBService.queryOgrID(
+        kresCode, kresAdi, ogrID, phoneNumber);
+    if (student != null) {
+      var _user = await _firebaseAuthService.currentUser();
+      _user!.kresAdi = kresAdi;
+      _user.kresCode = kresCode;
+      _user.studentMap = student.toMap();
+      _user.username = student.veliAdiSoyadi;
+      _user.position = 'visitor';
+      bool _sonuc = await _firestoreDBService.saveUser(_user);
+      if (_sonuc) {
+        return student;
+      } else {
+        return null;
+      }
+    } else
+      return null;
   }
 
   @override
@@ -88,18 +92,22 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<List<Photo>> getPhotoToMainGallery() async {
-    return await _firestoreDBService.getPhotoToMainGallery();
+  Future<List<Photo>> getPhotoToMainGallery(
+      String kresCode, String kresAdi) async {
+    return await _firestoreDBService.getPhotoToMainGallery(kresCode, kresAdi);
   }
 
   @override
-  Future<List<Photo>> getPhotoToSpecialGallery(String ogrID) async {
-    return await _firestoreDBService.getPhotoToSpecialGallery(ogrID);
+  Future<List<Photo>> getPhotoToSpecialGallery(
+      String kresCode, String kresAdi, String ogrID) async {
+    return await _firestoreDBService.getPhotoToSpecialGallery(
+        kresCode, kresAdi, ogrID);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getAnnouncements() async {
-    return await _firestoreDBService.getAnnouncements();
+  Future<List<Map<String, dynamic>>> getAnnouncements(
+      String kresCode, String kresAdi) async {
+    return await _firestoreDBService.getAnnouncements(kresCode, kresAdi);
   }
 
   @override

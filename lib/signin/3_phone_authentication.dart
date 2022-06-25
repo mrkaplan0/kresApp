@@ -4,17 +4,26 @@ import 'package:firebase_phone_auth_handler/firebase_phone_auth_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/View_models/user_model.dart';
 import 'package:krestakipapp/constants.dart';
+import 'package:krestakipapp/models/student.dart';
+import 'package:krestakipapp/models/user.dart';
+import 'package:krestakipapp/signin/error_login.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class VerifyPhoneNumberScreen extends StatelessWidget {
   final String phoneNumber;
+  final String kresCode;
+  final String kresAdi;
+  final String ogrID;
 
   String? _enteredOTP;
 
   VerifyPhoneNumberScreen({
     Key? key,
     required this.phoneNumber,
+    required this.kresCode,
+    required this.kresAdi,
+    required this.ogrID,
   }) : super(key: key);
 
   void _showSnackBar(BuildContext context, String text) {
@@ -25,17 +34,12 @@ class VerifyPhoneNumberScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserModel _userModel = Provider.of<UserModel>(context);
     return SafeArea(
       child: FirebasePhoneAuthHandler(
         phoneNumber: phoneNumber,
         timeOutDuration: const Duration(seconds: 60),
         onLoginSuccess: (userCredential, autoVerified) async {
-          await _userModel.signingWithPhone(userCredential);
-          _showSnackBar(
-            context,
-            'Phone number verified successfully!',
-          );
+          await loginSuccessMethod(userCredential, context);
         },
         onLoginFailed: (authException) {
           _showSnackBar(
@@ -144,5 +148,35 @@ class VerifyPhoneNumberScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<void> loginSuccessMethod(
+      UserCredential userCredential, BuildContext context) async {
+    final UserModel _userModel = Provider.of<UserModel>(context, listen: false);
+    try {
+      MyUser? _user = await _userModel.signingWithPhone(
+          userCredential, kresAdi, kresAdi, ogrID, phoneNumber);
+      print("Giriş yapan Kullanıcı $_user");
+      if (_user != null) {
+        Student? student =
+            await _userModel.queryOgrID(kresCode, kresAdi, ogrID, phoneNumber);
+        if (student != null) {
+          Navigator.pushNamed(context, '/LandingPage');
+        } else {
+          await _userModel.deleteUser();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ErrorLoginPage(),
+              ));
+        }
+      }
+    } catch (e) {
+      debugPrint('Hata Giriş yaparken hata çıktı: ' + e.toString());
+      _showSnackBar(
+        context,
+        'Phone number verified successfully!',
+      );
+    }
   }
 }

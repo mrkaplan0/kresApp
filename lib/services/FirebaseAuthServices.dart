@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/models/photo.dart';
+import 'package:krestakipapp/models/student.dart';
 import 'package:krestakipapp/models/user.dart';
 import 'package:krestakipapp/services/base/auth_base.dart';
 
@@ -36,30 +37,26 @@ class FirebaseAuthService implements AuthBase {
     }
   }
 
-  MyUser? myUser;
   @override
-  Future<MyUser?> signingWithPhone(UserCredential userCredential) async {
+  Future<bool> deleteUser() async {
+    try {
+      await _auth.currentUser?.delete();
+      return true;
+    } catch (e) {
+      debugPrint("Error delete account $e");
+      return false;
+    }
+  }
+
+  @override
+  Future<MyUser?> signingWithPhone(UserCredential userCredential,
+      String kresCode, String kresAdi, String ogrID, String phone) async {
     try {
       return _usersFromFirebase(userCredential.user!);
     } catch (e) {
       debugPrint("Hata phone auth $e");
       return null;
     }
-  }
-
-  @override
-  Future<MyUser> signingWithEmailAndPassword(String email, String sifre) async {
-    UserCredential sonuc =
-        await _auth.signInWithEmailAndPassword(email: email, password: sifre);
-
-    return _usersFromFirebase(sonuc.user!);
-  }
-
-  @override
-  Future<MyUser> createUserEmailAndPassword(String email, String sifre) async {
-    UserCredential sonuc = await _auth.createUserWithEmailAndPassword(
-        email: email, password: sifre);
-    return _usersFromFirebase(sonuc.user!);
   }
 
   @override
@@ -75,32 +72,14 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<List<Photo>> getPhotoToMainGallery() {
-    // TODO: implement getPhotoToMainGallery
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<Photo>> getPhotoToSpecialGallery(String ogrID) {
-    // TODO: implement getPhotoToSpecialGallery
-    throw UnimplementedError();
-  }
-
-  @override
-  @override
-  Future<List<Map<String, dynamic>>> getAnnouncements() {
-    // TODO: implement getAnnouncements
-    throw UnimplementedError();
-  }
-
-  @override
   Future<String> queryKresList(String kresCode) {
     // TODO: implement queryKresList
     throw UnimplementedError();
   }
 
   @override
-  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID) {
+  Future<Student?> queryOgrID(
+      String kresCode, String kresAdi, String ogrID, String phoneNumber) {
     // TODO: implement ogrNoControl
     throw UnimplementedError();
   }
@@ -108,6 +87,26 @@ class FirebaseAuthService implements AuthBase {
   @override
   Future<List<Map<String, dynamic>>> getKresList() {
     // TODO: implement getKresList
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getAnnouncements(
+      String kresCode, String kresAdi) {
+    // TODO: implement getAnnouncements
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Photo>> getPhotoToMainGallery(String kresCode, String kresAdi) {
+    // TODO: implement getPhotoToMainGallery
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Photo>> getPhotoToSpecialGallery(
+      String kresCode, String kresAdi, String ogrID) {
+    // TODO: implement getPhotoToSpecialGallery
     throw UnimplementedError();
   }
 }

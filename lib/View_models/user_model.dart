@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/locator.dart';
 import 'package:krestakipapp/models/photo.dart';
+import 'package:krestakipapp/models/student.dart';
 import 'package:krestakipapp/models/user.dart';
 import 'package:krestakipapp/repository/user_repository.dart';
 import 'package:krestakipapp/services/base/auth_base.dart';
@@ -66,58 +67,33 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<MyUser?> signingWithPhone(UserCredential userCredential) async {
+  Future<bool> deleteUser() async {
     try {
       state = ViewState.busy;
-      _users = await _userRepository.signingWithPhone(userCredential);
+      bool sonuc = await _userRepository.deleteUser();
+
+      _users = null;
+      return sonuc;
+    } catch (e) {
+      debugPrint("Error user delete :" + e.toString());
+      return false;
+    } finally {
+      state = ViewState.idle;
+    }
+  }
+
+  @override
+  Future<MyUser?> signingWithPhone(UserCredential userCredential,
+      String kresCode, String kresAdi, String ogrID, String phone) async {
+    try {
+      state = ViewState.busy;
+      _users = await _userRepository.signingWithPhone(
+          userCredential, kresAdi, kresAdi, ogrID, phone);
 
       return _users;
     } finally {
       state = ViewState.idle;
     }
-  }
-
-  @override
-  Future<MyUser?> signingWithEmailAndPassword(
-      String email, String sifre) async {
-    try {
-      if (emailsifreKontrol(email, sifre)) {
-        state = ViewState.busy;
-        _users =
-            await _userRepository.signingWithEmailAndPassword(email, sifre);
-
-        return _users;
-      } else
-        return null;
-    } finally {
-      state = ViewState.idle;
-    }
-  }
-
-  @override
-  Future<MyUser?> createUserEmailAndPassword(String email, String sifre) async {
-    try {
-      if (emailsifreKontrol(email, sifre)) {
-        state = ViewState.busy;
-        _users =
-            (await _userRepository.createUserEmailAndPassword(email, sifre))!;
-        return _users;
-      } else
-        return null;
-    } finally {
-      state = ViewState.idle;
-    }
-  }
-
-  bool emailsifreKontrol(String email, String sifre) {
-    var sonuc = true;
-
-    if (!email.contains('@')) {
-      emailHataMesaj = 'Geçerli bir email adresi girin.';
-      sonuc = false;
-    } else
-      emailHataMesaj = null;
-    return sonuc;
   }
 
   @override
@@ -136,15 +112,15 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<bool> queryOgrID(String kresCode, String kresAdi, String ogrID) async {
+  Future<Student?> queryOgrID(
+      String kresCode, String kresAdi, String ogrID, String phoneNumber) async {
     try {
       state = ViewState.busy;
-      bool sonuc = await _userRepository.queryOgrID(kresCode, kresAdi, ogrID);
-
-      return sonuc;
+      return await _userRepository.queryOgrID(
+          kresCode, kresAdi, ogrID, phoneNumber);
     } catch (e) {
       debugPrint("User Model noContorl hata :" + e.toString());
-      return false;
+      return null;
     } finally {
       state = ViewState.idle;
     }
@@ -175,9 +151,11 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<List<Photo>> getPhotoToMainGallery() async {
+  Future<List<Photo>> getPhotoToMainGallery(
+      String kresCode, String kresAdi) async {
     try {
-      var sonuc = await _userRepository.getPhotoToMainGallery();
+      var sonuc =
+          await _userRepository.getPhotoToMainGallery(kresCode, kresAdi);
 
       return sonuc;
     } catch (e) {
@@ -187,9 +165,11 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<List<Photo>> getPhotoToSpecialGallery(String ogrID) async {
+  Future<List<Photo>> getPhotoToSpecialGallery(
+      String kresCode, String kresAdi, String ogrID) async {
     try {
-      var sonuc = await _userRepository.getPhotoToSpecialGallery(ogrID);
+      var sonuc = await _userRepository.getPhotoToSpecialGallery(
+          kresCode, kresAdi, ogrID);
 
       return sonuc;
     } catch (e) {
@@ -199,9 +179,10 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getAnnouncements() async {
+  Future<List<Map<String, dynamic>>> getAnnouncements(
+      String kresCode, String kresAdi) async {
     try {
-      var sonuc = await _userRepository.getAnnouncements();
+      var sonuc = await _userRepository.getAnnouncements(kresCode, kresAdi);
 
       return sonuc;
     } catch (e) {

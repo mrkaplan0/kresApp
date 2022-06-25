@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:krestakipapp/constants.dart';
-import 'package:krestakipapp/signin/email_login.dart';
-import 'package:krestakipapp/signin/research_student_pre_register.dart';
+
+import 'package:krestakipapp/signin/1_query_school.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -29,8 +29,11 @@ class LoginPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: 250,
+                ),
                 SizedBox(
                   width: double.infinity,
                   height: 70,
@@ -38,40 +41,13 @@ class LoginPage extends StatelessWidget {
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ResearchStudent(),
+                          builder: (context) => QuerySchool(),
                           fullscreenDialog: true),
                     ),
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.orangeAccent.shade100,
                     ),
-                    child: Text("Kaydol"),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: kdefaultPadding),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 70,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EmailLogin(),
-                              fullscreenDialog: true)),
-                      style: TextButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor:
-                            Colors.orangeAccent.shade100.withOpacity(0.1),
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.orangeAccent.shade100),
-                        ),
-                      ),
-                      child: Text(
-                        "Giriş Yap",
-                        style: TextStyle(color: Colors.orangeAccent.shade200),
-                      ),
-                    ),
+                    child: Text("Giriş Yap"),
                   ),
                 ),
                 const SizedBox(height: 200),

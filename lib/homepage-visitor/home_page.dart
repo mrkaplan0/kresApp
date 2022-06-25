@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:krestakipapp/View_models/user_model.dart';
 import 'package:krestakipapp/common_widget/show_photo_widget.dart';
 import 'package:krestakipapp/constants.dart';
+import 'package:krestakipapp/homepage-visitor/announcement_page.dart';
 import 'package:krestakipapp/homepage-visitor/photo_gallery.dart';
 import 'package:krestakipapp/models/photo.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     final UserModel _userModel = Provider.of<UserModel>(context, listen: false);
-    _userModel.getPhotoToMainGallery().then((value) {
+    _userModel
+        .getPhotoToMainGallery(
+            _userModel.users!.kresCode!, _userModel.users!.kresAdi!)
+        .then((value) {
       setState(() {
         album = value;
       });
@@ -29,12 +33,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final UserModel _userModel = Provider.of<UserModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
           //centerTitle: true,
           automaticallyImplyLeading: false,
           title: Text(
-            "Pamuk Şekeri Anaokulu",
+            "${_userModel.users!.kresAdi}",
             style: Theme.of(context)
                 .textTheme
                 .headline6!
@@ -114,7 +119,12 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: const EdgeInsets.only(right: 11.0),
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AnnouncementPage()));
+                        },
                         child: Text(
                           "Tümünü Gör",
                           style: TextStyle(color: Colors.black26),
@@ -128,12 +138,59 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Text("31.10.2021 - Hoşgeldin Yeni Anasayfa!"),
+                  child: announcementList(),
                 ),
               ],
             )),
       ),
     );
+  }
+
+  Widget announcementList() {
+    final UserModel _userModel = Provider.of<UserModel>(context, listen: false);
+    return FutureBuilder<List<Map<String, dynamic>>>(
+        future: _userModel.getAnnouncements(
+            _userModel.users!.kresCode!, _userModel.users!.kresAdi!),
+        builder: (context, sonuc) {
+          if (sonuc.hasData) {
+            var announceList = sonuc.data!;
+            if (announceList.length > 0) {
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: announceList.length > 3 ? 3 : announceList.length,
+                  itemBuilder: (context, i) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 0.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                              "${announceList[i]['Duyuru Tarihi']}      ${announceList[i]['Duyuru Başlığı']}"),
+                          /*  Text(
+                            "Detayı Gör",
+                            style: TextStyle(
+                                // fontStyle: FontStyle.italic,
+                                color: Colors.black26),
+                          )*/
+                          IconButton(
+                            icon: Icon(
+                                Icons.keyboard_double_arrow_right_outlined),
+                            onPressed: () => _showAnnouncementDetail(
+                                announceList[i]['Duyuru Başlığı'],
+                                announceList[i]['Duyuru']),
+                          )
+                        ],
+                      ),
+                    );
+                  });
+            } else {
+              return Text("Henüz duyuru yok.");
+            }
+          } else
+            return Center(
+              child: Text("Henüz duyuru yok."),
+            );
+        });
   }
 
   Widget photoGalleryWidget() {
@@ -144,7 +201,7 @@ class _HomePageState extends State<HomePage> {
           height: 160,
           child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: 3,
+              itemCount: album!.length > 3 ? 3 : album!.length,
               itemBuilder: (context, i) {
                 return GestureDetector(
                   child: Stack(
@@ -219,5 +276,29 @@ class _HomePageState extends State<HomePage> {
     final UserModel _userModel = Provider.of<UserModel>(context, listen: false);
     bool sonuc = await _userModel.signOut();
     return sonuc;
+  }
+
+  _showAnnouncementDetail(
+      String announcementTitle, String? announcementDetail) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(announcementTitle),
+            content: SingleChildScrollView(
+              child: Text(announcementDetail != null
+                  ? announcementDetail
+                  : "Detay Yok"),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Kapat'),
+              )
+            ],
+          );
+        });
   }
 }
